@@ -36,6 +36,7 @@ class MyWebServer(socketserver.BaseRequestHandler):
         print("Connected to: ", self.client_address)
         #print ("Got a request of: %s\n" % self.data)
         req_type,path,version  = self.parse_req()
+        print("PATH: " +path)
         if req_type== "GET":
             if path != "/favicon.ico":
                 if self.check_traversal(path):
@@ -43,12 +44,14 @@ class MyWebServer(socketserver.BaseRequestHandler):
                 else:
                     error_resp = self.construct_headers("404 Not Found","text/html")
                     self.request.sendall(bytes(error_resp,"utf-8"))
+                    return 1
             else:
                 pass
 
         else:
             error_resp = self.construct_headers("405 Method Not Allowed","text/html")
             self.request.sendall(bytes(error_resp,"utf-8"))
+            return 1
 
     def check_traversal(self,path):
         if path == "/":
@@ -91,7 +94,7 @@ class MyWebServer(socketserver.BaseRequestHandler):
 
         if os.path.isdir(path):
             if not path.endswith("/"):
-                new_path = path+"/"
+                new_path = "/"+path+"/"
                 redirect_resp = self.construct_headers("301 Moved Permanently","text/html",new_path)
                 #print(redirect_resp)
                 self.request.sendall(bytes(redirect_resp,"utf-8"))
