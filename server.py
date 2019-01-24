@@ -81,16 +81,13 @@ class MyWebServer(socketserver.BaseRequestHandler):
             index_file= open("index.html","r")
             ok_resp += index_file.read() 
             self.request.sendall(bytes(ok_resp,"utf-8"))
-           
+            return 1
+
         else:
             path = path[1:]
-
-       # print("Path: " + path + "\t absPath: " +os.path.abspath(path) + "\t Exists: " , os.path.isfile(os.path.abspath(path)))
         if os.path.isfile(path):
             self.get_file(path)
-
-        #print(path)
-        #print(os.path.isdir(path))
+            return 1
 
         if os.path.isdir(path):
             if not path.endswith("/"):
@@ -98,12 +95,15 @@ class MyWebServer(socketserver.BaseRequestHandler):
                 redirect_resp = self.construct_headers("301 Moved Permanently","text/html",new_path)
                 #print(redirect_resp)
                 self.request.sendall(bytes(redirect_resp,"utf-8"))
+                return 1
             else:
                 new_path = path+"index.html"
                 self.get_file(new_path)
+                return 1
         else:
             error_resp= self.construct_headers("404 Not Found","text/html")
             self.request.sendall(bytes(error_resp,"utf-8"))
+            return 1
 
     def construct_headers(self,status,mimetype_header,location=None):
         status = "HTTP/1.1 {status}\r\n".format(status=status)
