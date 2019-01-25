@@ -36,7 +36,7 @@ class MyWebServer(socketserver.BaseRequestHandler):
         print("Connected to: ", self.client_address)
         #print ("Got a request of: %s\n" % self.data)
         req_type,path,version  = self.parse_req()
-        print("PATH: " +path)
+        #print("PATH: " +path)
         if req_type== "GET":
             if path != "/favicon.ico":
                 if self.check_traversal(path):
