@@ -39,12 +39,7 @@ class MyWebServer(socketserver.BaseRequestHandler):
         #print("PATH: " +path)
         if req_type== "GET":
             if path != "/favicon.ico":
-                if self.check_traversal(path):
-                    self.do_get(path)
-                else:
-                    error_resp = self.construct_headers("404 Not Found","text/html")
-                    self.request.sendall(bytes(error_resp,"utf-8"))
-                    return 1
+                self.do_get(path)
             else:
                 pass
 
@@ -52,20 +47,6 @@ class MyWebServer(socketserver.BaseRequestHandler):
             error_resp = self.construct_headers("405 Method Not Allowed","text/html")
             self.request.sendall(bytes(error_resp,"utf-8"))
             return 1
-
-    def check_traversal(self,path):
-        if path == "/":
-            return True
-        root = "/home/student/Desktop/404a1/CMPUT404-assignment-webserver/www/"
-        if root in os.path.abspath(path):
-            traversal =  os.path.exists(os.path.abspath(path))
-            return traversal
-        else:
-            path= os.path.abspath(path)
-            path = path[1:]
-            full_path = root+path
-            traversal = os.path.exists(full_path)
-            return traversal
 
     def get_file(self,afile):
         #code to get mimetype obtained from users Gringo Suave and Navi StackOverflow on January 18 2019
@@ -144,7 +125,7 @@ if __name__ == "__main__":
 
     www_dir = os.path.join(os.path.dirname(__file__), 'www')
     os.chdir(www_dir)
-
+    
     socketserver.TCPServer.allow_reuse_address = True
     # Create the server, binding to localhost on port 8080
     server = socketserver.TCPServer((HOST, PORT), MyWebServer)
